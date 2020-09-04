@@ -39,7 +39,7 @@ foreach ($server in $servers) {
         $device =  (Get-EC2Volume -VolumeId $volume).Attachments[0].Device # Gets the voulme attached device to add it into the snapshot name
         if ($device -eq "/dev/sda1") { $device = "sda1" } # If the device is sda1, remove the slashes and "dev"
         Write-Output ("[*] Starting snapshot of volume " + $volume + " - device " + $device + " from server " + $server)
-        $snapName = "snap-" + $server + "-" + $device + "-$(Get-Date -Format MMddyy)" # Generates snapshot name with device id, RITM/CHG, server name and date
+        $snapName = "snap-" + $server + "-" + $device + "-$(Get-Date -Format MMddyy)" # Generates snapshot name with device id, server name and date
         
         # Generates the snapshot and hopefully catches errors
         
