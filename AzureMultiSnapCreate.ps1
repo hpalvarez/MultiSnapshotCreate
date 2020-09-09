@@ -29,7 +29,7 @@ foreach ($server in $servers)
     Write-Output ("[*] Creating OS disk snapshot for server " + $server.name)
     $snapshotDisk = $serverData.StorageProfile # Gets all disks of VM
     $OSDiskSnapshotConfig = New-AzSnapshotConfig -SourceUri $snapshotDisk.OsDisk.ManagedDisk.id -CreateOption Copy -Location $server.location -OsType Windows # Configures the snapshot
-    $snapshotNameOS = "$($server.nombre)_$($snapshotdisk.OsDisk.Name)_snapshot_osdisk_$(Get-Date -Format MMddyy)" # Prepares the OS disk snapshot name
+    $snapshotNameOS = "$($server.name)_$($snapshotdisk.OsDisk.Name)_snapshot_osdisk_$(Get-Date -Format MMddyy)" # Prepares the OS disk snapshot name
 
     # Tries to do the snapshot, if it fails shows an error, in both cases it logs to AzureSnapLog.txt
     
