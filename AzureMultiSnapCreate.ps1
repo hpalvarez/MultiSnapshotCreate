@@ -3,6 +3,7 @@
 # USE WITH CAUTION - carefully check the server list prior to run this script
 # Read the license before running it!
 # https://github.com/hpalvarez/MultiSnapshotCreate
+# Uses code from https://thomasthornton.cloud/2020/03/27/azure-disk-snapshots/
 
 
 # Loads server list. Format is name;resource group;location
