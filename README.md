@@ -2,7 +2,7 @@
 
 PowerShell scripts to create snapsots of all the disks of a AWS EC2 or Azure VM.
 
-These scripts grab a list of Amazon AWS EC2 instances or Azure VMs from the file ServerList.txt (that you must create in the same folder of the script) and then creates a snapshot of each disk of it.
+These scripts grab a list of Amazon AWS EC2 instances or Azure VMs from the file ServerList.txt (that you must create in the same folder of the script) and then creates a snapshot of each disk of it. Use the -JustOS parameter if you only want to do snapshots of the OS drive of each server.
 
 It requires to have the Azure or AWS Powershell tools correctly installed and configured.
 
