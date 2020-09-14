@@ -5,6 +5,9 @@
 # https://github.com/hpalvarez/MultiSnapshotCreate
 # Uses code from https://thomasthornton.cloud/2020/03/27/azure-disk-snapshots/
 
+# If the -JustOS parameter is passed the script only does snaps of OS disks
+
+param ([switch]$JustOS = $false)
 
 # Loads server list. Format is name;resource group;location
 # Logs to AzureSnapLog.txt
@@ -44,27 +47,31 @@ foreach ($server in $servers)
 
     # Data disk snapshot creation
 
-    $dataDisks = ($snapshotDisk.DataDisks).name # Gets all the data disks
+    if(!$JustOS) { # Only does this if the -JustOS parameter is not given
 
-    # Loop to create each data disk snapshot
+        $dataDisks = ($snapshotDisk.DataDisks).name # Gets all the data disks
 
-    foreach ($dataDisk in $dataDisks) {
+        # Loop to create each data disk snapshot
 
-        $dataDisk = Get-AzDisk -ResourceGroupName $serverData.rg -DiskName $dataDisk # Get data disk information
-        Write-Output ("[*] Creating data disk " + $dataDisk.name + " snapshot for server " + $server.name)
-        $DataDiskSnapshotConfig = New-AzSnapshotConfig -SourceUri $dataDisk.Id -CreateOption Copy -Location $server.location # Configures the snapshot
-        $snapshotNameData = "$($server.name)_$($dataDisk.name)_snapshot_datadisk_$(Get-Date -Format MMddyy)" # Prepares the snapshot name
-        
-        # Tries to do the snapshot, if it fails shows an error, in both cases it logs to AzureSnapLog.txt
-        
-        try {
-            New-AzSnapshot -ResourceGroupName $server.rg -SnapshotName $snapshotNameData -Snapshot $DataDiskSnapshotConfig -ErrorAction Stop
-            Add-Content -Path .\AzureSnapLog.txt ("Success;" + $snapshotNameData + ";" + $server.name + ";" + $server.rg + ";" + $server.location)
-        } catch {
-            Write-Error ("Data disk snapshot for " + $server.name + " - disk " + $dataDisk.name + " failed")
-            Add-Content -Path .\AzureSnapLog.txt ("ERROR!!;" + $snapshotNameData + ";" + $server.name + ";" + $server.rg + ";" + $server.location)
+        foreach ($dataDisk in $dataDisks) {
+
+            $dataDisk = Get-AzDisk -ResourceGroupName $serverData.rg -DiskName $dataDisk # Get data disk information
+            Write-Output ("[*] Creating data disk " + $dataDisk.name + " snapshot for server " + $server.name)
+            $DataDiskSnapshotConfig = New-AzSnapshotConfig -SourceUri $dataDisk.Id -CreateOption Copy -Location $server.location # Configures the snapshot
+            $snapshotNameData = "$($server.name)_$($dataDisk.name)_snapshot_datadisk_$(Get-Date -Format MMddyy)" # Prepares the snapshot name
+            
+            # Tries to do the snapshot, if it fails shows an error, in both cases it logs to AzureSnapLog.txt
+            
+            try {
+                New-AzSnapshot -ResourceGroupName $server.rg -SnapshotName $snapshotNameData -Snapshot $DataDiskSnapshotConfig -ErrorAction Stop
+                Add-Content -Path .\AzureSnapLog.txt ("Success;" + $snapshotNameData + ";" + $server.name + ";" + $server.rg + ";" + $server.location)
+            } catch {
+                Write-Error ("Data disk snapshot for " + $server.name + " - disk " + $dataDisk.name + " failed")
+                Add-Content -Path .\AzureSnapLog.txt ("ERROR!!;" + $snapshotNameData + ";" + $server.name + ";" + $server.rg + ";" + $server.location)
+            }
         }
     }
+
     Clear-Variable serverData # Clears variables
 }
 
