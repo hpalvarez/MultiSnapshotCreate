@@ -4,6 +4,10 @@
 # Read the license before running it!
 # https://github.com/hpalvarez/MultiSnapshotCreate
 
+# If the -JustOS parameter is passed the script only does snaps of OS disks
+
+param ([switch]$JustOS = $false)
+
 # Loads server list from file ServerList.txt. Logs to AWSSnapLog.txt.
 
 $servers = Get-Content -Path .\ServerList.txt
@@ -36,8 +40,10 @@ foreach ($server in $servers) {
     # Loop to generate each snapshot
 
     foreach ($volume in $volumeIds) {
+
         $device =  (Get-EC2Volume -VolumeId $volume).Attachments[0].Device # Gets the voulme attached device to add it into the snapshot name
         if ($device -eq "/dev/sda1") { $device = "sda1" } # If the device is sda1, remove the slashes and "dev"
+        if ( ($device -ne "sda1") -and ($JustOS) ) { Continue } # Jumps to next disk if JustOS parameter is passed and disk is not sda1
         Write-Output ("[*] Starting snapshot of volume " + $volume + " - device " + $device + " from server " + $server)
         $snapName = "snap-" + $server + "-" + $device + "-$(Get-Date -Format MMddyy)" # Generates snapshot name with device id, server name and date
         
@@ -52,6 +58,7 @@ foreach ($server in $servers) {
             Add-Content .\AWSSnapLog.txt ("ERROR!! - Snapshot creation for volume " + $volume + " - device " + $device + " on server " + $server + " failed")
         }
     }
+
     Clear-Variable idInstance # Makes sure that the idInstance variable value is null before the next iteration
 }
 
