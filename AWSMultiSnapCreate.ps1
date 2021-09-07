@@ -3,6 +3,7 @@
 # USE WITH CAUTION - carefully check the server list prior to run this script
 # Read the license before running it!
 # https://github.com/hpalvarez/MultiSnapshotCreate
+# Comentario de prueba
 
 # If the -JustOS parameter is passed the script only does snaps of OS disks
 
